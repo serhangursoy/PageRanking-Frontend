@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Page Analyzer with PageRank</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="images/icons/favicon.png"/>
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<!--===============================================================================================-->
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+	<style type="text/css">
+	#mynetwork {
+		width: 600px;
+		height: 400px;
+		border: 1px solid lightgray;
+	}
+
+.loading {
+	 position: fixed;
+  z-index: 999;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 } 
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
+}
+
+.textLoading {
+	margin: 30%;
+	margin-left: 39%;
+	color: white;
+}
+</style>
+
+
+</head>
+<body>
+
+  
+
+    <!-- report here -->
+
+	<div class="bg-contact2" style="background-image: url('images/bg-01.jpg');">
+		<div class="container-contact2">
+			<div class="wrap-contact2">
+				<div class="contact2-form">
+					<span class="contact2-form-title">
+						Provide us your web page url, so we can analyze it for you
+					</span>
+
+					<div class="wrap-input2 validate-input" data-validate="Web page is required">
+						<input class="input2" type="text" name="webpage" id="weburl">
+						<span class="focus-input2" data-placeholder="Your web url (Use http:// or https://)"></span>
+					</div>
+
+					<div class="container-contact2-form-btn">
+						<div class="wrap-contact2-form-btn">
+							<div class="contact2-form-bgbtn"></div>
+
+							<button class="contact2-form-btn" onclick="fetchData()">
+								Analyze
+							</button>
+						</div>
+					</div>
+				</div>
+
+
+				<div id="mynetwork"></div>
+			</div>
+		</div>
+
+	</div>
+
+
+<div class="loading" id="loadPanel" style="background-color: rgba(0,0,0,0.4); display: none">
+<div id="loader"> </div>
+<h3 class="textLoading">This might take a while </h3>
+</div>
+	<!--===============================================================================================-->
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="vendor/select2/select2.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="js/main.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/core.js"></script>
+
+
+	<script type="text/javascript">
+		
+
+		var intervalID;
+
+		function fetchData() {
+
+			document.getElementById("loadPanel").style.display = "block";
+			var urlElem = document.getElementById("weburl");
+			$.ajax({
+				type: "post",
+				url: "https://infinite-waters-52810.herokuapp.com/api/getPageRank",
+    // The key needs to match your method's input parameter (case-sensitive).
+    data: JSON.stringify({ url: urlElem.value }),
+    crossDomain: true,
+    contentType: "application/json",
+    success: function(){  console.log("Im here"); intervalID = setInterval(harassServer, 5000);  },
+    failure: function(errMsg) {
+    	console.log("asfasfa");
+    	console.log(errMsg);
+    }
+});
+
+		}
+
+
+		function harassServer() {
+			var urlElem = document.getElementById("weburl");
+			$.ajax({
+				type: "post",
+				url: "https://infinite-waters-52810.herokuapp.com/api/getStatus",
+    // The key needs to match your method's input parameter (case-sensitive).
+    data: JSON.stringify({ url: urlElem.value }),
+    crossDomain: true,
+    contentType: "application/json",
+    dataType: "json",
+    success: function(data){  checkHarrasResult(data)  },
+    failure: function(errMsg) {
+    	console.log(errMsg);
+    }
+});
+		}
+
+		function checkHarrasResult(data) {
+			if(data.message != "No file") {
+				resultPage(data.content[0]);
+				clearInterval(intervalID);
+			}
+		}
+
+		function resultPage(data) {
+console.log(data);
+			var nodeArr = data.Nodes;
+			var edgeArr = data.Edges;
+
+			var finalArr = [];
+			for (var i = 0, len = nodeArr.length; i < len; i++) {
+				var valRank = nodeArr[i].Value;
+				var labelName =(valRank)*100;
+				var tmpObj = { id: nodeArr[i].Id, title: nodeArr[i].Adress + ' | ' + labelName + '%', value: valRank };
+				finalArr.push(tmpObj);
+			}
+
+			var nodes = new vis.DataSet(finalArr);
+
+			var nodeFinArr = [];
+			for (var i = 0, len = edgeArr.length; i < len; i++) {
+				var tmpObj = { from: edgeArr[i].From, to: edgeArr[i].To }
+				nodeFinArr.push(tmpObj);
+			}
+
+			var edges = new vis.DataSet(nodeFinArr);
+
+  // create a network
+  var container = document.getElementById('mynetwork');
+  var data = {
+  	nodes: nodes,
+  	edges: edges
+  };
+  var options = {
+        nodes: {
+          shape: 'dot',
+          scaling:{
+            label: {
+              min:0.00001,
+              max:1
+            }
+          }
+        }
+      };
+  var network = new vis.Network(container, data, options);
+
+  document.getElementById("loadPanel").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
