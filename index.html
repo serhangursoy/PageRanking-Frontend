@@ -53,7 +53,7 @@
   margin: -75px 0 0 -75px;
   border: 16px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 16px solid #3498db;
+  border-top: 16px solid rgba(219,21,99,0.8);
   width: 120px;
   height: 120px;
   -webkit-animation: spin 2s linear infinite;
@@ -90,9 +90,35 @@
 }
 
 .textLoading {
-	margin: 30%;
-	margin-left: 39%;
+	text-align: center;
+	margin-top: 30%;
 	color: white;
+}
+
+
+
+#resultTable {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    display: none;
+}
+
+#resultTable td, #resultTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#resultTable tr:nth-child(even){background-color: #f2f2f2;}
+
+#resultTable tr:hover {background-color: #ddd;}
+
+#resultTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #d5007d;
+    color: white;
 }
 </style>
 
@@ -128,8 +154,18 @@
 					</div>
 				</div>
 
-
+<br/>
 				<div id="mynetwork"></div>
+<br/>
+				<table id="resultTable">
+  <tr>
+    <th>Rank</th>
+    <th>URL</th>
+  </tr>
+  <tr id="resultInner">
+   
+  </tr>
+</table>
 			</div>
 		</div>
 
@@ -162,6 +198,11 @@
 
 			document.getElementById("loadPanel").style.display = "block";
 			var urlElem = document.getElementById("weburl");
+
+			if (urlElem.value.slice(-1) === '/') {
+				urlElem.value = (urlElem.value).substring(0,(urlElem.value).length - 1); 
+			}
+
 			$.ajax({
 				type: "post",
 				url: "https://infinite-waters-52810.herokuapp.com/api/getPageRank",
@@ -220,7 +261,7 @@ console.log(data);
 
 			var nodeFinArr = []; 
 			for (var i = 0, len = edgeArr.length; i < len; i++) {
-				var tmpObj = { from: edgeArr[i].From, to: edgeArr[i].To }
+				var tmpObj = { from: edgeArr[i].From, to: edgeArr[i].To, arrows:'to' }
 				nodeFinArr.push(tmpObj);
 			}
 
@@ -233,6 +274,10 @@ console.log(data);
   	edges: edges
   };
   var options = {
+  	height: '100%',
+  width: '100%',
+  	physics:{
+    enabled: false},
         nodes: {
           shape: 'dot',
           scaling:{
@@ -241,11 +286,42 @@ console.log(data);
               max:1
             }
           }
-        }
+        },
+         layout: {
+    improvedLayout:true
+  
+  }
       };
   var network = new vis.Network(container, data, options);
 
   document.getElementById("loadPanel").style.display = "none";
+  document.getElementById("resultTable").style.display = "block";
+
+  var resultTableInner =  document.getElementById("resultTable");
+
+
+  function compare(a,b) {
+  if (a.Value*100 < b.Value*100)
+    return 1;
+  if (a.Value*100 > b.Value*100)
+    return -1;
+  return 0;
+}
+
+nodeArr.sort(compare);
+
+
+  		var finalStr = "";
+			for (var i = 0, len = nodeArr.length; i < len; i++) {
+				var valRank = nodeArr[i].Value;
+				var labelName =(valRank)*100;
+				var tmpSTR = "<tr> <td>" + labelName + "%</td>" + "<td>" + nodeArr[i].Adress + "</td> </tr>";
+				finalStr += tmpSTR;
+			}
+
+			resultTableInner.innerHTML += finalStr;
+
+
 }
 
 </script>
