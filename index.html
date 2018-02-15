@@ -158,13 +158,7 @@
 				<div id="mynetwork"></div>
 <br/>
 				<table id="resultTable">
-  <tr>
-    <th>Rank</th>
-    <th>URL</th>
-  </tr>
-  <tr id="resultInner">
-   
-  </tr>
+  
 </table>
 			</div>
 		</div>
@@ -311,7 +305,7 @@ console.log(data);
 nodeArr.sort(compare);
 
 
-  		var finalStr = "";
+  		var finalStr = "<tr><th>Rank</th><th>URL</th></tr>";
 			for (var i = 0, len = nodeArr.length; i < len; i++) {
 				var valRank = nodeArr[i].Value;
 				var labelName =(valRank)*100;
